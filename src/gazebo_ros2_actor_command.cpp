@@ -48,6 +48,9 @@ void GazeboRosActorCommand::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->follow_mode_ = "velocity";
   this->vel_topic_ = "/cmd_vel";
   this->path_topic_ = "/cmd_path";
+
+  this->max_speed_topic_ = "/actor_max_speed";
+
   this->lin_tolerance_ = 0.1;
   this->lin_velocity_ = 1;
   this->ang_tolerance_ = IGN_DTOR(5);
@@ -102,6 +105,11 @@ void GazeboRosActorCommand::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     path_topic_, rclcpp::QoS(10),
     std::bind(&GazeboRosActorCommand::PathCallback, this, std::placeholders::_1));
 
+  // Subscribe to the max speed topic 
+  this->max_speed_sub_ = this->ros_node_->create_subscription<std_msgs::msg::Float64>(
+    max_speed_topic_, rclcpp::QoS(10),
+    std::bind(&GazeboRosActorCommand::MaxSpeedCallback, this, std::placeholders::_1));
+
   // Connect the OnUpdate function to the WorldUpdateBegin event.
   this->connections_.push_back(event::Events::ConnectWorldUpdateBegin(
       std::bind(&GazeboRosActorCommand::OnUpdate, this, std::placeholders::_1)));
@@ -113,7 +121,8 @@ void GazeboRosActorCommand::Reset() {
   this->last_update_ = 0;
   this->idx_ = 0;
   // Initialize target poses vector with origin
-  this->target_poses_.push_back(ignition::math::Vector3d(0.0, 0.0, 0.0));
+  // JRH: hardcoded origin pose
+  this->target_poses_.push_back(ignition::math::Vector3d(8.0, -2.28, 0.0));
   // Set target pose to the current pose
   this->target_pose_ = this->target_poses_.at(this->idx_);
 
@@ -137,6 +146,11 @@ void GazeboRosActorCommand::VelCallback(const geometry_msgs::msg::Twist::SharedP
   vel_cmd.X() = msg->linear.x;
   vel_cmd.Z() = msg->angular.z;
   this->cmd_queue_.push(vel_cmd);
+}
+
+void GazeboRosActorCommand::MaxSpeedCallback(const std_msgs::msg::Float64::SharedPtr msg) {
+  double selected_val = msg->data;
+  this->lin_velocity_ = selected_val;
 }
 
 void GazeboRosActorCommand::PathCallback(const nav_msgs::msg::Path::SharedPtr msg) {

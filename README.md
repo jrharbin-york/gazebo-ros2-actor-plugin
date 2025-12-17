@@ -102,6 +102,10 @@ This plugin have the following parameters:
 |:---|:---|:---|
 | `cmd_vel`  | [geometry_msgs/Twist](http://docs.ros.org/api/geometry_msgs/html/msg/Twist.html) | Give the actor a velocity input |
 | `cmd_path` | [nav_msgs/Path](http://docs.ros.org/api/nav_msgs/html/msg/Path.html) | Give the actor a path input |
+| `actor_max_speed` | [std_msgs/msg/Float64](https://docs.ros.org/en/api/std_msgs/html/msg/Float64.html) | *Added JRH: (17/12/2025):* when in path follow mode, sets the speed of the actor along the path | 
+
+*TODO: JRH - * need to lookup the origin from the world file. At the moment there is a hardcoded origin at (8.0, -2.28) which the robot will move
+towards before starting along its path, even if the actors is placed at a different location in the world file.
 
 
 ## Acknowledge

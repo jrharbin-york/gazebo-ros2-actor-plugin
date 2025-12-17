@@ -25,6 +25,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include <nav_msgs/msg/path.hpp>
+#include <std_msgs/msg/float64.hpp>
 
 #include <string>
 #include <queue>
@@ -66,6 +67,10 @@ class GazeboRosActorCommand : public ModelPlugin {
   /// \param[in] _model Pointer to the incoming path message.
   void PathCallback(const nav_msgs::msg::Path::SharedPtr msg);
 
+  /// \brief Callback function for receiving path commands from a publisher.
+  /// \param[in] _model Pointer to the incoming path message.
+  void MaxSpeedCallback(const std_msgs::msg::Float64::SharedPtr msg);
+    
   /// \brief Function that is called every update cycle.
   /// \param[in] _info Timing information.
   void OnUpdate(const common::UpdateInfo &_info);
@@ -76,7 +81,8 @@ class GazeboRosActorCommand : public ModelPlugin {
   /// \brief Subscribers for velocity and path commands.
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr vel_sub_;
   rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr path_sub_;
-
+  rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr max_speed_sub_;
+  
   /// \brief Topic names for velocity and path commands.
   std::string vel_topic_;
   std::string path_topic_;
@@ -106,6 +112,9 @@ class GazeboRosActorCommand : public ModelPlugin {
   /// \brief Flag to determine if
   /// the plugin will follow a path or velocity subscriber
   std::string follow_mode_;
+
+  /// JRH: allows changing the max speed for the actor
+  std::string max_speed_topic_;
 
   /// \brief Target walking velocity for the actor
   ignition::math::Pose3d target_vel_;

@@ -16,12 +16,12 @@ class PathPublisher(Node):
         path_msg.header.stamp = self.get_clock().now().to_msg()
         path_msg.header.frame_id = 'world'
 
-        num_points = 5
+        num_points = 10
         for i in range(num_points):
             p = PoseStamped()
             p.header = path_msg.header
-            p.pose.position.x = 2.0 * i
-            p.pose.position.y = 0.0
+            p.pose.position.x = 8.0 + (5.0 * i)
+            p.pose.position.y = -2.28
             p.pose.position.z = 0.0
             p.pose.orientation.x = 0.0
             p.pose.orientation.y = 0.0
